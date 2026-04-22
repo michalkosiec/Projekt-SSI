@@ -1,18 +1,21 @@
+# don't think too much about this, it works and it's not the focus of the project,
+# just a simple utility to print tables in a nice format, enjoy :)
+
 class TableBuilder:
-    def __init__(self, header: list):
+    def __init__(self, header: list): # creates a builder with the given column names
         self.clen = len(header)
         self.column_widths = [0] * self.clen
         self.rowlists = []
         self.add_row(header)
 
-    def add_row(self, row: list):
+    def add_row(self, row: list): # adds a row to the table
         if len(row) < self.clen:
             row = row + [""] * (self.clen - len(row))
         
         self.column_widths = [max(self.column_widths[j], len(str(row[j]))) for j in range(self.clen)]
         self.rowlists.append(row)
 
-    def build(self) -> str:
+    def build(self) -> str: # builds the table into a string
         result = [
             self._format_outside_sep(),
             self._format_header(),
