@@ -2,3 +2,5 @@
 all_v2.csv
 __pycache__/
 scripts/
+output_clean/
+output_raw/
