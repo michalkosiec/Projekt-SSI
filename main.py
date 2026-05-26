@@ -12,9 +12,12 @@ from decision_tree import DecisionTree
 BORDER = 60 * "-"
 
 DATAFILE = "filtered_v3.csv"
+EXPECTED_ROWS = 200000
+
 OUT_DIR_RAW = "output_raw/"
 OUT_DIR_CLEAN = "output_clean/"
-EXPECTED_ROWS = 200000
+
+NUM_BINS = 5
 
 # currently trained model
 current_model: BaseModel = DummyModel()
@@ -74,7 +77,7 @@ def main():
     print(BORDER)
     print("Rozpoczęto wstępne przetwarzanie danych...")
 
-    raw_flats = RussianFlat.from_csv_file(DATAFILE, skip=1, record_limit=None)
+    raw_flats = RussianFlat.from_csv_file(DATAFILE, skip=1, num_bins=NUM_BINS)
     print(f"Załadowano mieszkania w liczbie {len(raw_flats)}.")
 
     if len(raw_flats) != EXPECTED_ROWS:

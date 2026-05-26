@@ -6,8 +6,6 @@ from datetime import date, datetime, time
 # building_type: 0 - other | 1 - panel | 2 - monolithic | 3 - brick | 4 - block | 5 - wood
 # object_type: 1 - secondary real estate market | 11 - new building
 
-NUM_BINS = 8
-
 # a raw csv record as a class, for internal use only
 class RussianFlatCsv(NamedTuple):
     price: int
@@ -72,42 +70,33 @@ class RussianFlat(NamedTuple):
     price_dividers: list[float] = []
 
     @classmethod
-    def set_price_dividers(cls, prices: list[int], num_bins: int = NUM_BINS):
+    def set_price_dividers(cls, prices: list[int], num_bins: int):
         cls.price_dividers = statistics.quantiles(prices, n=num_bins)
 
     @classmethod
     def get_dynamic_price_range(cls, price: int) -> str:
-        # Zabezpieczenie na wypadek braku wyliczonych progów
         if not cls.price_dividers:
             return "unknown"
 
         divs = cls.price_dividers
-        
-        # bisect_right znajduje odpowiedni indeks (koszyk) w czasie O(log N)
         idx = bisect.bisect_right(divs, price)
 
-        # Skrajny lewy koszyk (najtańsze)
         if idx == 0:
-            return f"<= {divs[0]/1_000_000:.1f}M"
+            return f"C{idx} <= {divs[0]/1_000_000:.1f}M"
 
-        # Skrajny prawy koszyk (najdroższe)
         if idx == len(divs):
-            return f"> {divs[-1]/1_000_000:.1f}M"
+            return f"C{idx} > {divs[-1]/1_000_000:.1f}M"
 
-        # Koszyki środkowe (dynamiczne)
-        low = divs[idx-1]
-        high = divs[idx]
-        return f"{low/1_000_000:.1f}M - {high/1_000_000:.1f}M"
+        low, high = divs[idx-1], divs[idx]
+        return f"C{idx} {low/1_000_000:.1f}M - {high/1_000_000:.1f}M"
 
     @classmethod
-    def from_csv_file(cls, filename: str, skip: int, record_limit: int | None=None, num_bins: int = NUM_BINS) -> list['RussianFlat']:
+    def from_csv_file(cls, filename: str, skip: int, num_bins: int) -> list['RussianFlat']:
         csv_records = []
         with open(filename, "r", encoding="utf-8") as f:
             for i, line in enumerate(f):
                 if i < skip:
                     continue
-                if record_limit is not None and i >= skip + record_limit:
-                    break
                 csv_records.append(RussianFlatCsv.from_csv_line(line))
         
         if not csv_records:
