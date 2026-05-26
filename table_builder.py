@@ -1,18 +1,29 @@
+import re
+
 # don't think too much about this, it works and it's not the focus of the project,
 # just a simple utility to print tables in a nice format, enjoy :)
 
 class TableBuilder:
+    ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*m")
+
     def __init__(self, header: list): # creates a builder with the given column names
         self.clen = len(header)
         self.column_widths = [0] * self.clen
         self.rowlists = []
         self.add_row(header)
 
+    @staticmethod
+    def _strip_ansi(text: str) -> str:
+        return TableBuilder.ANSI_ESCAPE.sub("", text)
+
     def add_row(self, row: list): # adds a row to the table
         if len(row) < self.clen:
             row = row + [""] * (self.clen - len(row))
         
-        self.column_widths = [max(self.column_widths[j], len(str(row[j]))) for j in range(self.clen)]
+        self.column_widths = [
+            max(self.column_widths[j], len(self._strip_ansi(str(row[j]))) )
+            for j in range(self.clen)
+        ]
         self.rowlists.append(row)
 
     def build(self) -> str: # builds the table into a string
@@ -40,4 +51,10 @@ class TableBuilder:
         return "+" + ("-" * (len(self._format_header()) - 2)) + "+"
     
     def _format_row(self, row: list) -> str:
-        return "| " + " | ".join([str(row[j]).ljust(self.column_widths[j]) for j in range(self.clen)]) + " |"
+        cells = []
+        for j in range(self.clen):
+            raw = str(row[j])
+            visible = self._strip_ansi(raw)
+            padding = self.column_widths[j] - len(visible)
+            cells.append(raw + " " * padding)
+        return "| " + " | ".join(cells) + " |"

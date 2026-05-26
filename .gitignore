@@ -1,3 +1,4 @@
 # Download database from Kaggle (it is too large to be stored in GitHub)
 all_v2.csv
 __pycache__/
+scripts/

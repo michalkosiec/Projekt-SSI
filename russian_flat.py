@@ -1,3 +1,4 @@
+import statistics
 from typing import NamedTuple
 from datetime import date, datetime, time
 
@@ -65,31 +66,80 @@ class RussianFlat(NamedTuple):
     price_range: str
     data: RussianFlatProps
 
-    @staticmethod
-    def from_csv_file(filename: str, skip: int, record_limit: int | None=None) -> list['RussianFlat']:
-        flats = []
-        with open(filename, "r") as f:
+    price_dividers: list[float] = []
+
+    @classmethod
+    def set_price_dividers(cls, prices: list[int], num_bins: int = 5):
+        cls.price_dividers = statistics.quantiles(prices, n=num_bins)
+
+    @classmethod
+    def get_dynamic_price_range(cls, price: int) -> str:
+        if not cls.price_dividers:
+            return "unknown"
+
+        divs = cls.price_dividers
+        if price <= divs[0]:
+            return f"<= {divs[0]/1_000_000:.1f}M"
+            
+        for i in range(1, len(divs)):
+            if price <= divs[i]:
+                return f"{divs[i-1]/1_000_000:.1f}M - {divs[i]/1_000_000:.1f}M"
+                
+        return f"> {divs[-1]/1_000_000:.1f}M"
+
+    @classmethod
+    def from_csv_file(cls, filename: str, skip: int, record_limit: int | None=None, num_bins: int = 5) -> list['RussianFlat']:
+        csv_records = []
+        with open(filename, "r", encoding="utf-8") as f:
             for i, line in enumerate(f):
                 if i < skip:
                     continue
                 if record_limit is not None and i >= skip + record_limit:
                     break
-                flat = RussianFlat.from_csv_line(line)
-                flats.append(flat)
+                csv_records.append(RussianFlatCsv.from_csv_line(line))
+        
+        if not csv_records:
+            return []
+
+        all_prices = [record.price for record in csv_records]
+        cls.set_price_dividers(all_prices, num_bins)
+
+        flats = []
+        for record in csv_records:
+            flats.append(
+                cls(
+                    price_range=cls.get_dynamic_price_range(record.price),
+                    data=RussianFlatProps(
+                        publish_year=record.date_value.year,
+                        publish_month=record.date_value.month,
+                        geo_lat=record.geo_lat,
+                        geo_lon=record.geo_lon,
+                        region_id=str(record.region),
+                        building_type=cls.building_type_string(record.building_type),
+                        level=record.level,
+                        levels=record.levels,
+                        rooms=record.rooms,
+                        area=record.area,
+                        kitchen_area=record.kitchen_area,
+                        new_building=record.object_type == 11
+                    )
+                )
+            )
+            
         return flats
 
-    @staticmethod
-    def from_csv_line(line: str) -> 'RussianFlat':
+    @classmethod
+    def from_csv_line(cls, line: str) -> 'RussianFlat':
         flat_csv = RussianFlatCsv.from_csv_line(line)
-        return RussianFlat(
-            price_range=RussianFlat.price_string(flat_csv.price),
+        return cls(
+            price_range=cls.get_dynamic_price_range(flat_csv.price),
             data=RussianFlatProps(
                 publish_year=flat_csv.date_value.year,
                 publish_month=flat_csv.date_value.month,
                 geo_lat=flat_csv.geo_lat,
                 geo_lon=flat_csv.geo_lon,
-                region_id=str(flat_csv.region), # this is not a string, but should be treated as string
-                building_type=RussianFlat.building_type_string(flat_csv.building_type),
+                region_id=str(flat_csv.region),
+                building_type=cls.building_type_string(flat_csv.building_type),
                 level=flat_csv.level,
                 levels=flat_csv.levels,
                 rooms=flat_csv.rooms,
@@ -99,18 +149,6 @@ class RussianFlat(NamedTuple):
             )
         )
 
-    # converts price into string
-    @staticmethod
-    def price_string(price: int) -> str: # TODO: adjust based on data analysis
-        if price < 0: return "negative"
-        if price < 1_000_000: return "0-1M"
-        if price < 2_000_000: return "1M-2M"
-        if price < 3_000_000: return "2M-3M"
-        if price < 4_000_000: return "3M-4M"
-        if price < 5_000_000: return "4M-5M"
-        return "5M+"
-
-    # converts building type into string
     @staticmethod
     def building_type_string(building_type: int) -> str:
         if building_type == 0: return "other"
