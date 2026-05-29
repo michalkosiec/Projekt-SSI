@@ -82,13 +82,13 @@ class RussianFlat(NamedTuple):
         idx = bisect.bisect_right(divs, price)
 
         if idx == 0:
-            return f"C{idx} <= {divs[0]/1_000_000:.1f}M"
+            return f"C{idx+1} <= {divs[0]/1_000_000:.1f}M"
 
         if idx == len(divs):
-            return f"C{idx} > {divs[-1]/1_000_000:.1f}M"
+            return f"C{idx+1} > {divs[-1]/1_000_000:.1f}M"
 
         low, high = divs[idx-1], divs[idx]
-        return f"C{idx} {low/1_000_000:.1f}M - {high/1_000_000:.1f}M"
+        return f"C{idx+1} {low/1_000_000:.1f}M - {high/1_000_000:.1f}M"
 
     @classmethod
     def from_csv_file(cls, filename: str, skip: int, num_bins: int) -> list['RussianFlat']:

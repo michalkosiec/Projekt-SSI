@@ -1,6 +1,7 @@
 from utils import Utils
 from typing import NamedTuple
 from operator import attrgetter
+from typing import Callable
 import statistics
 import random
 
@@ -10,6 +11,7 @@ class Preprocessor:
     # removing outliers using 3-sigma rule
     # using int and float fields only (ignoring strings, bools etc.)
     def outlier_indexes[T : NamedTuple](data: list[T]) -> list[int]:
+
         if len(data) <= 1:
             return []
         
@@ -37,6 +39,7 @@ class Preprocessor:
     @staticmethod
     def divide_data_randomly(data: list, ratio: float) -> tuple[list, list]:
         data = data[:]
-        random.shuffle(data)
+        rng = random.Random(42) # fixed seed for reproducibility
+        rng.shuffle(data)
         split_index = int(len(data) * ratio)
         return data[:split_index], data[split_index:]

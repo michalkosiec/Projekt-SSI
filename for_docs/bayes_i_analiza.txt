@@ -1,0 +1,35 @@
+RAPORT Z OPTYMALIZACJI KARTOTEKI: KLASYFIKATOR NAIWNEGO BAYESA (PREDYKCJA CEN MIESZKAŃ)
+
+1. Punkt wyjścia: "Naiwna" implementacja (Dokładność: ~39%)
+- Zbudowaliśmy klasyfikator od zera, zakładając początkowo, że wszystkie cechy mają rozkład normalny (Gaussa).
+- Zaobserwowane problemy: Model faworyzował małe klasy (zjawisko zapadania się wariancji skutkujące eksplozją prawdopodobieństwa) oraz błędnie interpretował wartości binarne (np. typy budynków) szukając w nich dzwonu Gaussa.
+
+2. Pierwsze modyfikacje i stabilizacja (Dokładność: ~42%)
+- Wprowadzono dynamiczne wygładzanie wariancji (Variance Smoothing), uzależniając dodawaną stałą epsilon od globalnej wariancji cechy.
+- Zastosowano transformację logarytmiczną dla powierzchni (area, kitchen_area), aby "ścisnąć" ich długi ogon i zbliżyć do rozkładu normalnego.
+- Wprowadzono wygładzanie Laplace'a dla prawdopodobieństw a priori (priors).
+
+3. Diagnoza wizualna: Zderzenie matematyki z rzeczywistością
+- Napisaliśmy moduł analityczny generujący histogramy z nałożoną teoretyczną krzywą Gaussa oraz wykresy słupkowe.
+- Wnioski z analizy wykresów wywróciły nasze podejście:
+  * Geografia (geo_lat, geo_lon): Rozkład wielomodalny. Miasta to odrębne szczyty na osi. Uśrednianie ich Gaussem wskazywało na "najdroższe mieszkania w bezludnych lasach".
+  * Miesiące (publish_month): Cykliczne. Średnia wypadała w lecie, przez co Gauss bezlitośnie ucinał szanse mieszkań wystawianych zimą, traktując je jako ekstremalne odchylenia.
+  * Cechy budowlane (levels, rooms): Skokowe/dyskretne. Wyraźne standardy inżynieryjne (np. bloki 5- i 9-piętrowe, kawalerki oznaczone jako -1) były niszczone przez gładką krzywą ciągłą.
+
+4. Architektura docelowa: Mieszany Naiwny Bayes (Mixed Naive Bayes)
+W oparciu o wizualną naturę danych, model został przebudowany na trzy niezależne tory prawdopodobieństwa:
+- Gaussowski: Zarezerwowany wyłącznie dla zlogarytmizowanych wartości ściśle ciągłych (area, kitchen_area).
+- Bernoulliego: Dla wartości binarnych (new_building), z wygładzaniem Laplace'a.
+- Wielomianowy (Multinomial): Dla całej reszty cech dyskretnych i kategorycznych (pokoje, piętra, rok, miesiąc, region, typ budynku).
+
+5. Przełom: Spatial Hashing
+- Zamiast klastrowania, zastosowano genialny w swojej prostocie trik: współrzędne geograficzne zostały zaokrąglone do pierwszego miejsca po przecinku (np. "55.8_37.6"), co podzieliło mapę na kwadraty o boku ok. 11 km. Model potraktował je jako kategorie (dzielnice), całkowicie omijając problem uśredniania lokalizacji.
+
+6. Rezultat ostateczny (Dokładność: 57.16%)
+- Skok o 18 punktów procentowych względem pierwszej wersji.
+- Bicie losowości (która wynosiłaby 20% dla 5 klas) o ponad 37 punktów procentowych.
+- Macierz błędów potwierdziła, że model zaczął rozumieć rynek:
+  * Mocna skuteczność na skrajnościach (bardzo wysoka precyzja dla mieszkań najtańszych C1 i luksusowych C5).
+  * Zdecydowana większość pomyłek to błędy sąsiedztwa (np. przypisanie mieszkania C3 do sąsiadującej klasy C2 lub C4), co odzwierciedla naturalną płynność cen na rynku nieruchomości.
+
+Wniosek: Prawdopodobnie osiągnięto praktyczny limit dla algorytmu zakładającego warunkową niezależność cech.

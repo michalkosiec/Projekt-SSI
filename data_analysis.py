@@ -2,6 +2,7 @@ import os
 import shutil
 import statistics
 import matplotlib
+import math
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from russian_flat import RussianFlat
@@ -145,18 +146,68 @@ class DataAnalysis:
             fig.savefig(os.path.join(output_dir, "correlation_matrix.png"), dpi=150)
             plt.close(fig)
 
-            # 6. Wykresy punktowe pojedynczych cech
-            print("Generowanie wykresów punktowych cech ciągłych...")
+            # 6. Wykresy rozkładu poszczególnych cech (Histogram/Gauss lub Barplot)
+            print("Generowanie wykresów rozkładu poszczególnych cech...")
             for field in continuous_names:
                 values = [getattr(entry.data, field) for entry in data]
-                fig, ax = plt.subplots(figsize=(8, 4))
-                ax.scatter(range(len(values)), values, s=10, color="#2a9d8f", alpha=0.7)
-                ax.set_xlabel("Indeks rekordu")
-                ax.set_ylabel(field)
-                ax.set_title(f"Wykres punktowy cechy: {field}")
+                if not values:
+                    continue
+
+                fig, ax = plt.subplots(figsize=(8, 5))
+                
+                # Heurystyka: cecha jest dyskretna, jeśli ma <= 25 unikalnych wartości
+                # lub wszystkie jej wartości to czyste liczby całkowite.
+                unique_values = set(values)
+                is_discrete = len(unique_values) <= 25 or all(isinstance(v, int) or (isinstance(v, float) and v.is_integer()) for v in values)
+
+                # --- 1. RYSOWANIE DANYCH (Słupki lub Histogram) ---
+                if is_discrete:
+                    counts = {}
+                    for v in values:
+                        counts[v] = counts.get(v, 0) + 1
+                    
+                    x_vals = sorted(counts.keys())
+                    
+                    # Zamiana zliczeń na częstość (aby skala Y pasowała do krzywej Gaussa)
+                    total_count = len(values)
+                    y_vals = [counts[x] / total_count for x in x_vals]
+                    
+                    ax.bar(x_vals, y_vals, color="#2a9d8f", edgecolor="black", alpha=0.7, label="Wartości (rzeczywistość)")
+                    
+                    if len(x_vals) <= 15:
+                        ax.set_xticks(x_vals)
+                    else:
+                        step = len(x_vals) // 15
+                        ax.set_xticks(x_vals[::step])
+                        
+                    ax.set_title(f"Rozkład wartości dyskretnej: {field}")
+                else:
+                    ax.hist(values, bins=30, density=True, color="#e9c46a", edgecolor="black", alpha=0.6, label="Histogram (rzeczywistość)")
+                    ax.set_title(f"Rozkład wartości ciągłej: {field}")
+
+                # --- 2. RYSOWANIE KRZYWEJ GAUSSA (Dla obu typów) ---
+                if len(values) > 1:
+                    mean = statistics.mean(values)
+                    stdev = statistics.stdev(values)
+                    
+                    if stdev > 0:
+                        x_min, x_max = min(values), max(values)
+                        step = (x_max - x_min) / 100 if x_max > x_min else 1
+                        x_axis = [x_min + i * step for i in range(101)]
+                        y_axis = []
+                        for x in x_axis:
+                            exponent = math.exp(-0.5 * ((x - mean) / stdev) ** 2)
+                            pdf = (1 / (stdev * math.sqrt(2 * math.pi))) * exponent
+                            y_axis.append(pdf)
+                        
+                        ax.plot(x_axis, y_axis, color="#e76f51", linewidth=2, label="Krzywa Gaussa (założenie modelu)")
+                        ax.legend()
+
+                ax.set_ylabel("Częstość / Gęstość prawdopodobieństwa")
+                ax.set_xlabel(field)
                 fig.tight_layout()
                 safe_name = field.replace(" ", "_").replace("/", "_")
-                fig.savefig(os.path.join(output_dir, f"scatter_{safe_name}.png"), dpi=150)
+                fig.savefig(os.path.join(output_dir, f"dist_{safe_name}.png"), dpi=150)
                 plt.close(fig)
 
             print(f"Wykresy zapisane do katalogu: \"{output_dir}\".")
@@ -167,7 +218,6 @@ class DataAnalysis:
 
     @staticmethod
     def analyse_results(predicted: list[str], real: list[str]):
-        # [Istniejący kod analyse_results pozostaje bez zmian]
         if not predicted or not real or len(predicted) != len(real):
             print("Błąd: Dane przewidywane i rzeczywiste nie pasują do siebie.")
             return
@@ -179,7 +229,7 @@ class DataAnalysis:
 
         builder = TableBuilder(["Metryka", "Wynik"])
         builder.add_row(["Poprawne predykcje", f"{correct} / {total}"])
-        builder.add_row(["Skuteczność (Accuracy)", f"{accuracy:.2f}%"])
+        builder.add_row(["Dokładność (Accuracy)", f"{accuracy:.2f}%"])
         print(builder.build())
 
         print("\n--- Macierz korelacji wyników (confusion matrix) ---")
