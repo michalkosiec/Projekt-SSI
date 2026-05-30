@@ -36,13 +36,12 @@ class NaiveBayes(BaseModel):
             all_continuous_features.append(cont_features)
             self.class_counts[label] += 1
             
-            # Rejestrowanie wszystkich unikalnych wartości dla cech kategorycznych
             for i, val in enumerate(cat_features):
                 global_cat_uniques[i].add(val)
 
         self.num_classes = len(self.class_counts)
 
-        # 2. Obliczanie globalnego wygładzania wariancji dla nielicznych cech ciągłych
+        # 2. Obliczanie globalnego wygładzania wariancji dla cech ciągłych
         global_variances = []
         if total_samples > 1 and all_continuous_features:
             global_columns = list(zip(*all_continuous_features))
@@ -57,11 +56,10 @@ class NaiveBayes(BaseModel):
 
         # 3. Trening parametrów dla każdej klasy
         for label in self.class_counts:
-            # Wygładzanie Laplace'a dla Priors
             self.class_priors[label] = (self.class_counts[label] + 1) / (total_samples + self.num_classes)
             class_size = self.class_counts[label]
             
-            # --- CECHY CIĄGŁE (Gauss) ---
+            # 1. Trening: Ciągłe (Gauss)
             cont_columns = zip(*separated_data_cont[label])
             cont_stats = []
             for i, column in enumerate(cont_columns):
@@ -73,7 +71,7 @@ class NaiveBayes(BaseModel):
                 cont_stats.append((mean, variance + epsilons[i]))
             self.continuous_stats[label] = cont_stats
 
-            # --- CECHY BINARNE (Bernoulli z wygładzaniem Laplace'a) ---
+            # 2. Trening: Binarne (Bernoulli)
             bin_columns = zip(*separated_data_bin[label])
             bin_probs = []
             alpha_bin = 1.0
@@ -83,7 +81,7 @@ class NaiveBayes(BaseModel):
                 bin_probs.append(prob_one)
             self.binary_probs[label] = bin_probs
 
-            # --- CECHY KATEGORYCZNE / DYSKRETNE (Multinomial z wygładzaniem Laplace'a) ---
+            # 3. Trening: Kategoryczne (Multinomial)
             cat_columns = zip(*separated_data_cat[label])
             self.cat_probs[label] = {}
             self.cat_unseen_probs[label] = {}
@@ -97,12 +95,10 @@ class NaiveBayes(BaseModel):
                 v_total = len(global_cat_uniques[i])
                 self.cat_probs[label][i] = {}
                 
-                # Oblicz prawdopodobieństwo dla każdej znanej globalnie wartości
                 for val in global_cat_uniques[i]:
                     prob = (counts[val] + alpha_cat) / (class_size + alpha_cat * v_total)
                     self.cat_probs[label][i][val] = prob
                 
-                # Wartość dla zupełnie nowych danych (Out of Vocabulary) w zbiorze testowym
                 self.cat_unseen_probs[label][i] = alpha_cat / (class_size + alpha_cat * v_total)
 
     def predict(self, entry: RussianFlatProps) -> str:
@@ -112,16 +108,15 @@ class NaiveBayes(BaseModel):
         max_log_prob = -float('inf')
         
         for label in self.class_counts:
-            # Prawdopodobieństwo a priori
             log_prob = math.log(self.class_priors[label])
             
-            # 1. Cechy ciągłe (Gauss)
+            # 1. Ciągłe (Gauss)
             stats = self.continuous_stats[label]
             for x, (mean, var) in zip(cont_features, stats):
                 log_pdf = -0.5 * math.log(2 * math.pi * var) - ((x - mean) ** 2) / (2 * var)
                 log_prob += log_pdf
                 
-            # 2. Cechy binarne (Bernoulli)
+            # 2. Binarne (Bernoulli)
             probs = self.binary_probs[label]
             for x, p_one in zip(bin_features, probs):
                 if x == 1.0:
@@ -129,7 +124,7 @@ class NaiveBayes(BaseModel):
                 else:
                     log_prob += math.log(1.0 - p_one)
                     
-            # 3. Cechy kategoryczne (Multinomial)
+            # 3. Kategoryczne (Multinomial)
             for i, val in enumerate(cat_features):
                 prob = self.cat_probs[label][i].get(val, self.cat_unseen_probs[label][i])
                 log_prob += math.log(prob)
@@ -162,8 +157,7 @@ class NaiveBayes(BaseModel):
             int(entry.rooms),
             int(entry.region_id),
             str(entry.building_type),
-            # Sektor geograficzny np. "55.8_37.6" (~11km x 11km)
-            f"{round(float(entry.geo_lat), 1)}_{round(float(entry.geo_lon), 1)}",
+            f"{round(float(entry.geo_lat), 1)}_{round(float(entry.geo_lon), 1)}", # 11km x 11km
         )
         
         return continuous, binary, categorical
