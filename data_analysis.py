@@ -102,6 +102,7 @@ class DataAnalysis:
             ax.set_xlabel("Przedział cenowy")
             ax.set_ylabel("Liczba mieszkań")
             ax.set_title("Rozkład liczby mieszkań według przedziałów cenowych")
+            ax.set_xticks(range(len(ranges)))
             ax.set_xticklabels(ranges, rotation=45, ha="right")
             fig.tight_layout()
             fig.savefig(os.path.join(output_dir, "class_distribution.png"), dpi=150)
