@@ -1,0 +1,388 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[polish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage[]{algorithm2e}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\usepackage{color}
+\usepackage{listings}
+
+\lstloadlanguages{% Check Dokumentation for further languages ...
+	C,
+	C++,
+	csh,
+	Java
+}
+
+\definecolor{red}{rgb}{0.6,0,0} % for strings
+\definecolor{blue}{rgb}{0,0,0.6}
+\definecolor{green}{rgb}{0,0.8,0}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+
+\lstset{
+	language=Python,
+	basicstyle=\footnotesize\ttfamily,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	tabsize=2,
+	extendedchars=true,
+	breaklines=true,
+	frame=b,
+	stringstyle=\color{blue}\ttfamily,
+	showspaces=false,
+	showtabs=false,
+	xleftmargin=17pt,
+	framexleftmargin=17pt,
+	framexrightmargin=5pt,
+	framexbottommargin=4pt,
+	commentstyle=\color{green},
+	morecomment=[l]{\#},
+	showstringspaces=false,
+	keywordstyle=\color{cyan},
+	identifierstyle=\color{red},
+}
+\usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{blue}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+
+\addtolength{\hoffset}{-1.5cm}
+\addtolength{\marginparwidth}{-1.5cm}
+\addtolength{\textwidth}{3cm}
+\addtolength{\voffset}{-1cm}
+\addtolength{\textheight}{2.5cm}
+\setlength{\topmargin}{0cm}
+\setlength{\headheight}{0cm}
+
+\begin{document}
+	
+	\title{Systemy Sztucznej Inteligencji\\
+	\small{Dokumentacja projektu -- Klasyfikacja przedziału cenowego rosyjskich mieszkań}}
+	\author{Kamil Skop, Michał Kosiec, Szymon Sobelski - gr. 8, ?, ?}
+	\date{\today}
+
+	\maketitle
+	\tableofcontents
+	\newpage
+
+	%--------------------------------------------------------------
+	\section{Część I}
+	%--------------------------------------------------------------
+
+	\subsection{Opis programu}
+
+	Celem projektu jest klasyfikacja przedzialu cenowego rosyjskich mieszkan na podstawie ich cech
+	(powierzchnia, liczba pokoi, pietro, lokalizacja geograficzna, typ budynku itp.).
+	Dane wejsciowe stanowi plik CSV zawierajacy 200\,000 rekordow.
+	Cena kazego mieszkania zostaje zakwalifikowana do jednego z $N = 5$ rowno licznych przedzialow cenowych
+	(klas \texttt{C1}--\texttt{C5}) wyznaczanych dynamicznie kwantylami ze zbioru treningowego.
+	
+	Program losowo, z użyciem stałego \texttt{seed = 42} dzieli wczytane dane na zbiór treningowy oraz testowy w proporcji \texttt{80:20} po uprzednim oczyszczeniu go z outlierów na podstawie reguły 3-sigma na cechach ciągłych (gdy odległość dowolnej cechy od średniej przekracza 3 odchylenia standardowe, usuwany jest cały rekord).
+
+	Program implementuje od zera, bez uzycia zewnetrznych bibliotek uczenia maszynowego,
+	trzy klasyfikatory:
+	\begin{itemize}
+		\item \textbf{KNN} (k najblizszych sasiadow),
+		\item \textbf{Naiwny Bayes} (mieszany: Gauss + Bernoulli + wielomianowy),
+		\item \textbf{Drzewo decyzyjne} (kryterium Gini, ograniczenie glebokosci i minimalnego liscia).
+	\end{itemize}
+	
+	W sprawozdaniu przeprowadzono również analizę rezultatów każdego z wytrenowanych klasyfikatorów.
+	
+	\newpage
+	\subsection{Instrukcja obsługi}
+	\textbf{Wymagania:}
+	\begin{itemize}
+		\item Python 3.12+
+		\item Biblioteka \texttt{matplotlib}
+		\item Obecność przetworzonej bazy danych z Kaggle
+	\end{itemize}
+	
+	\textbf{Uruchomienie:}
+	\begin{itemize}
+		\item Upewnić się, że w katalogu projektu znajduje się plik \texttt{filtered\_v3.csv}. Jeśli ten nie występuje, należy pobrać zbiór danych ze strony Kaggle, a następnie wygenerować go za pośrednictwem skryptu, umieszczonego w katalogu \texttt{datalab/}.
+		\item Uruchomić skrypt za pomocą polecenia \texttt{python main.py}.
+	\end{itemize}
+	
+	\textbf{Uwaga:} Przetestowanie KNN może wymagać zmniejszenia parametru \texttt{EXPECTED\_ROWS} w kodzie źródłowym do np. 10 000, ponieważ algorytm ten jest bardzo niewydajny i zwyczajne nie radzi sobie z większymi ilościami rekordów.
+	
+	\subsection{Opis obsługi}
+	Program wczytuje plik \texttt{filtered\_v3.csv} z biezacego katalogu,
+	usuwa outliery i prezentuje menu tekstowe. Należy wybrać interesującą nas opcję, wprowadzając ją z klawiatury i wciskając enter:
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.79\textwidth]{img/main\_menu.png}
+		\caption{Zrzut ekranu menu głównego.}
+		\label{fig:menu_glowne}
+	\end{figure}
+	\begin{enumerate}
+		\item Analiza danych (wyświetla analizę danych oraz generuje wykresy do katalogów \texttt{output\_raw/} i \texttt{output\_clean/}).
+		\item Trening modelu KNN.
+		\item Trening modelu Naiwny Bayes.
+		\item Trening modelu Drzewo decyzyjne.
+		\item Analiza wyników aktualnie wytrenowanego modelu (macierz pomyłek, dokładność itd.).
+		\item Wyjście.
+	\end{enumerate}
+
+	\newpage
+
+	%--------------------------------------------------------------
+	\section{Część II}
+	%--------------------------------------------------------------
+
+	\subsection{Opis działania}
+	
+	\subsubsection{Przetwarzanie wstępne i binning cen}
+	
+	Cena mieszkania jest wartością ciągłą. Aby problem stał się klasyfikacją,
+	ceny dzielone są na $N$ równo licznych przedziałów (kwantylowych):
+	\[
+	q_i = \text{kwantyl}\!\left(\frac{i}{N}\right), \quad i = 1,\ldots, N-1.
+	\]
+	Dla $N = 5$ otrzymujemy 5 klas \texttt{C1}--\texttt{C5}.
+	Podział wyznaczany jest raz z całego zbioru (po usunięciu outlierów),
+	co gwarantuje równo liczne klasy i eliminuje wpływ wartości ekstremalnych na granice.
+	
+	\subsubsection*{Usuwanie outlierów -- reguła 3-sigma}
+	
+	Dla każdej cechy liczbowej $x_j$ wyznaczana jest średnia $\mu_j$ i odchylenie standardowe $\sigma_j$.
+	Rekord uznaje się za outlier, jeżeli dla dowolnej cechy $j$:
+	\[
+	|x_j - \mu_j| > 3\sigma_j.
+	\]
+	
+	\subsubsection{Algorytm KNN}
+	
+	Klasyfikator k najbliższych sąsiadów ($k = 7$) przydziela klasę na podstawie
+	ważonego głosowania sąsiadów. Dla pary przykładów $a$, $b$ stosuje się metrykę hybrydową:
+	
+	\[
+	d(a, b) = \underbrace{\sqrt{\sum_{j} \left(\frac{a_j - b_j}{s_j}\right)^2}}_{\text{część ciągła}}
+	+ d_{\text{region}} + d_{\text{budynek}} + d_{\text{nowe}}
+	\]
+	gdzie $s_j$ to odchylenie standardowe $j$-tej cechy ciągłej (normalizacja),
+	a dodatkowe składniki binarne karzą za różny region ($+1{,}0$), typ budynku ($+0{,}5$)
+	lub różny status nowego budownictwa ($+0{,}4$).
+	
+	Waga sąsiada odwrotnie proporcjonalna do odległości:
+	\[
+	w_i = \frac{1}{d_i + \varepsilon}, \quad \varepsilon = 10^{-9}.
+	\]
+	
+	\newpage
+	\subsubsection{Naiwny Bayes}
+	
+	Klasyczny Naiwny Bayes zakłada, że wszystkie cechy są warunkowo niezależne
+	i mają rozkład normalny. Diagnoza wizualna rozkładów cech wykazała, że założenie
+	o gaussowskości jest niespełnione dla większości zmiennych:
+	
+	\begin{itemize}
+		\item \textbf{Lokalizacja geograficzna}: rozkład wielomodalny (skupiska miejskie).
+		\item \textbf{Miesiąc}: rozkład cykliczny.
+		\item \textbf{Liczba pokoi / pięter}: wartości dyskretne ze skokami.
+	\end{itemize}
+	
+	W odpowiedzi wdrożono \emph{mieszany Naiwny Bayes} (Mixed Naive Bayes)
+	z trzema niezależnymi torami prawdopodobieństwa:
+	
+	\begin{enumerate}
+		\item \textbf{Gaussowski} -- dla $\log(\text{area}+\varepsilon)$ i $\log(\text{kitchen\_area}+\varepsilon)$:
+		\[
+		P(x_j \mid c) = \frac{1}{\sqrt{2\pi\sigma_{jc}^2}}
+		\exp\!\left(-\frac{(x_j - \mu_{jc})^2}{2\sigma_{jc}^2}\right).
+		\]
+		\item \textbf{Bernoulliego} -- dla cechy binarnej \texttt{new\_building}
+		(wygładzanie Laplace'a, $\alpha = 1$):
+		\[
+		P(x_j \mid c) = p_{jc}^{x_j}(1-p_{jc})^{1-x_j}, \quad
+		p_{jc} = \frac{n_{1jc} + 1}{n_c + 2}.
+		\]
+		\item \textbf{Wielomianowy} -- dla pozostałych cech dyskretnych i kategorycznych
+		(rok, miesiąc, piętro, liczba pięter, pokoje, region, typ budynku, hasz geo):
+		\[
+		P(x_j = v \mid c) = \frac{n_{vjc} + \alpha}{n_c + \alpha \cdot |V_j|}.
+		\]
+	\end{enumerate}
+	
+	Spatial hashing: współrzędne geograficzne zaokrąglane są do 0{,}1 stopnia
+	($\approx 11$ km), co zastępuje kosztowne klasteryzowanie i pozwala traktować
+	lokalizacje jako kategorie.
+	
+	Klasyfikacja: wybierana jest klasa z maksymalnym logarytmem a posteriori:
+	\[
+	\hat{c} = \arg\max_c \left[
+	\log P(c) + \sum_j \log P(x_j \mid c)
+	\right].
+	\]
+	
+	\subsubsection{Drzewo decyzyjne}
+	
+	Drzewo budowane jest metodą zachłanną (CART). Kryterium podziału to nieczystość Gini:
+	\[
+	\text{Gini}(S) = 1 - \sum_{c} \left(\frac{|S_c|}{|S|}\right)^2.
+	\]
+	Najlepszy podział minimalizuje ważoną sumę nieczystości potomków:
+	\[
+	\text{Gain} = \text{Gini}(S) - \frac{|S_L|}{|S|}\text{Gini}(S_L) - \frac{|S_R|}{|S|}\text{Gini}(S_R).
+	\]
+	Ograniczenia: maksymalna głębokość $= 13$, minimalna liczba próbek w liściu $= 10$.
+	Trening odbywa się na losowej próbce 5\,000 rekordów (seed = 42).
+
+	\subsection{Algorytm}
+
+	Ponizej przedstawiono pseudokod glownego potoku przetwarzania danych.
+
+	\begin{algorithm}[H]
+		\KwData{Plik CSV z danymi mieszkan, liczba klas $N = 5$, proporcja treningu $r = 0{,}8$}
+		\KwResult{Wytrenowany klasyfikator, wyniki na zbiorze testowym}
+		Wczytaj wszystkie rekordy z pliku CSV\;
+		Wyznacz granice klas cenowych kwantylami z cen wszystkich rekordow\;
+		Przypisz kazdy rekord do klasy \texttt{C1}--\texttt{C5}\;
+		Oblicz srednia i odch. stand. kazdej cechy numerycznej\;
+		\ForEach{rekord}{
+			\If{dowolna cecha odbiega o $> 3\sigma$}{
+				Oznacz jako outlier\;
+			}
+		}
+		Usun outliery ze zbioru\;
+		Przetasuj zbior losowo (seed=42)\;
+		Podziel na zbior treningowy ($80\%$) i testowy ($20\%$)\;
+		\textbf{Wybierz model} (KNN / Naiwny Bayes / Drzewo decyzyjne)\;
+		Trenuj wybrany model na zbiorze treningowym\;
+		\ForEach{przyklad ze zbioru testowego}{
+			Przewidz klase cenowa\;
+			Porownaj z etykieta rzeczywista\;
+		}
+		Wyswietl macierz pomylek i dokladnosc\;
+		\caption{Główny potok algorytmu programu}
+	\end{algorithm}
+
+	\newpage
+	\subsection{Baza danych}
+	Dane wejściowe: plik \texttt{filtered\_v3.csv} (ok. 15 MB, 200\,000 rekordów). Zbiór został uzyskany poprzez przetasowanie i sztuczne zmniejszenie zbioru bazowego, pochodzącego z Kaggle, link: \href{https://www.kaggle.com/datasets/mrdaniilak/russia-real-estate-20182021}{https://www.kaggle.com/datasets/mrdaniilak/russia-real-estate-20182021} za pomocą skryptu z katalogu \texttt{datalab/}. Zawiera on około 5,5 miliona rekordów ogłoszeń sprzedaży mieszkań w Rosji w latach 2018 - 2021, redukowanych i tasowanych do 200 000 wpisów. Jako, że w plikach projektu nie załączono bazy, należy wygenerować ją samodzielnie z użyciem wspomnianego wyżej skryptu oraz pliku pobranego z linku.
+	
+	\subsection{Struktura rekordu}
+	\begin{center}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Kolumna} & \textbf{Typ} & \textbf{Opis} \\
+		\hline
+		price & int & Cena mieszkania (RUB) \\
+		date & date & Data wystawienia ogłoszenia (YYYY-MM-DD) \\
+		time & time & Czas wystawienia ogłoszenia \\
+		geo\_lat & float & Szerokość geograficzna \\
+		geo\_lon & float & Dlugość geograficzna \\
+		region & int & ID regionu Rosji \\
+		building\_type & int & Typ budynku (więcej informacji dostępnych na Kaggle) \\
+		level & int & Piętro mieszkania \\
+		levels & int & Liczba pięter w budynku \\
+		rooms & int & Liczba pokoi (-1 = kawalerka) \\
+		area & float & Powierzchnia całkowita (m$^2$) \\
+		kitchen\_area & float & Powierzchnia kuchni (m$^2$) \\
+		object\_type & int & 1 = rynek wtórny, 11 = nowe budownictwo \\
+		\hline
+	\end{tabular}
+	\end{center}
+
+	\newpage
+	\subsection{Implementacja}
+	Projekt podzielony jest na nastepujące pliki:
+	\begin{itemize}
+		\item \texttt{russian\_flat.py} -- klasy danych (\texttt{RussianFlatCsv}, \texttt{RussianFlatProps}, \texttt{RussianFlat}); wczytywanie i etykietowanie rekordów.
+		\item \texttt{preprocessor.py} -- usuwanie outlierów (reguła 3-sigma) i losowy podział na zbiory.
+		\item \texttt{base\_model.py} -- abstrakcyjna klasa bazowa \texttt{BaseModel}.
+		\item \texttt{knn.py} -- klasyfikator KNN z hybrydową metryką i ważoną głosowaniem.
+		\item \texttt{naive\_bayes.py} -- mieszany Naiwny Bayes (Gauss + Bernoulli + wielomianowy).
+		\item \texttt{decision\_tree.py} -- drzewo decyzyjne CART z kryterium Gini.
+		\item \texttt{data\_analysis.py} -- analiza statystyczna, macierz korelacji Pearsona, wykresy.
+		\item \texttt{main.py} -- główna petla menu, orkiestracja całego potoku.
+	\end{itemize}
+	
+	\subsubsection*{Wybrane fragmenty kodu}
+
+	\textbf{Przykład:} Wyznaczanie skal do normalizacji w KNN.
+	\begin{lstlisting}[caption=Obliczanie skal normalizacyjnych (knn.py)]
+def _compute_continuous_scales(self, training_data):
+    examples = [_ for _ in training_data]
+    columns = list(zip(*(
+        self._extract_features(flat.data)[0]
+        for flat in examples
+    )))
+    scales = []
+    for column in columns:
+        stdev = statistics.stdev(column) if len(column) > 1 else 0.0
+        if stdev <= 0.0:
+            stdev = 1.0
+        scales.append(stdev)
+    return tuple(scales)
+	\end{lstlisting}
+
+	\textbf{Przykład:} Trening Naiwnego Bayesa -- wygładzanie wariancji dla toru gaussowskiego.
+	\begin{lstlisting}[caption=Wygładzanie wariancji (naive\_bayes.py)]
+global_variances = []
+global_columns = list(zip(*all_continuous_features))
+for col in global_columns:
+    mean = sum(col) / len(col)
+    var = sum((x - mean)**2 for x in col) / (len(col) - 1)
+    global_variances.append(var)
+epsilons = [max(1e-4 * var, 1e-9) for var in global_variances]
+	\end{lstlisting}
+
+	\subsection{Eksperymenty}
+	
+	Poniżej przedstawiono wyniki przeprowadzonych eksperymentów, obejmujących trening przygotowanych klasyfikatorów oraz ich ocenę na zbiorze testowym.
+	
+	\subsubsection*{KNN}
+	
+	\subsubsection*{Naiwny Bayes}
+	
+	\subsubsection*{Drzewo decyzyjne}
+	
+	\subsection*{Porównanie}
+
+	\subsection{Wnioski}
+
+	Na podstawie wygenerowanych histogramów z nakładaną krzywą Gaussa stwierdzono:
+	\begin{itemize}
+		\item Cechy \texttt{area} i \texttt{kitchen\_area} -- po logarytmowaniu przybliżają rozkład normalny; traktowane gaussowsko.
+		\item Cechy \texttt{geo\_lat}, \texttt{geo\_lon} -- wyraźny rozkład wielomodalny (skupiska miast); traktowane jako kategorie przez spatial hashing.
+		\item Cechy \texttt{publish\_month} -- rozkład cykliczny; traktowane jako kategorie.
+		\item Cechy \texttt{level}, \texttt{levels}, \texttt{rooms} -- wartości dyskretne; traktowane wielomianowo.
+	\end{itemize}
+	
+	Na podstawie wyników eksperymentów stwierdzono:
+	\begin{itemize}
+		\item W praktyce, najlepszym z wytrenowanych klasyfikatorów okazał się Naiwny Bayes ze względu na swoją wysoką wydajność oraz skuteczność, a także brak problemów z treningiem, biorącym pod uwagę cały zbiór danych wejściowych.
+		\item KNN ze względu na swoją bardzo niską wydajność, pomimo osiągnięcia najwyższej dokładności, w praktycznych zastosowaniach byłby bezuzyteczny.
+	\end{itemize}
+
+	\newpage
+
+	%--------------------------------------------------------------
+	\section{Pełen kod aplikacji}
+	%--------------------------------------------------------------
+
+	\lstset{language=Python, basicstyle=\scriptsize\ttfamily, breaklines=true,
+		numbers=left, numberstyle=\tiny, frame=b,
+		commentstyle=\color{green}, keywordstyle=\color{cyan},
+		identifierstyle=\color{red}, stringstyle=\color{blue}\ttfamily}
+
+	\subsubsection*{main.py}
+	\begin{lstlisting}
+# Trzeba tu wrzucic wszystkie nasze pliki Pythona
+print("Hello World!")
+	\end{lstlisting}
+
+	\subsubsection*{knn.py}
+	\begin{lstlisting}
+print("Hello World!")
+	\end{lstlisting}
+
+\end{document}

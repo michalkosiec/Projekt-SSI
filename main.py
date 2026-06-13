@@ -80,8 +80,12 @@ def main():
     raw_flats = RussianFlat.from_csv_file(DATAFILE, skip=1, num_bins=NUM_BINS)
     print(f"Załadowano mieszkania w liczbie {len(raw_flats)}.")
 
-    if len(raw_flats) != EXPECTED_ROWS:
+    if len(raw_flats) < EXPECTED_ROWS:
         print(f"UWAGA: Oczekiwano {EXPECTED_ROWS} wierszy, ale załadowano {len(raw_flats)}.")
+
+    if len(raw_flats) > EXPECTED_ROWS:
+        raw_flats = raw_flats[:EXPECTED_ROWS]
+        print(f"UWAGA: Załadowano więcej wierszy niż oczekiwano. Użyto tylko pierwszych {EXPECTED_ROWS} wierszy.")
 
     if len(raw_flats) == 0:
         print("Nie można kontynuować bez danych. Zamykam program.")
