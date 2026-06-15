@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.9)  13 JUN 2026 04:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.9)  15 JUN 2026 20:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -949,7 +949,7 @@ LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 8
 File: t1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
 )
 [2]
-<img/main_menu.png, id=109, 432.11438pt x 170.88844pt>
+<img/main_menu.png, id=104, 432.11438pt x 170.88844pt>
 File: img/main_menu.png Graphic file (type png)
 <use img/main_menu.png>
 Package pdftex.def Info: img/main_menu.png  used on input line 121.
@@ -985,51 +985,73 @@ Overfull \hbox (6.0pt too wide) in paragraph at lines 328--328
 [][][][][][][] 
  []
 
-[8] [9] [10] (dokumentacja_SSI.aux)
+[8]
+File: img/main_menu.png Graphic file (type png)
+<use img/main_menu.png>
+Package pdftex.def Info: img/main_menu.png  used on input line 347.
+(pdftex.def)             Requested size: 475.35826pt x 187.99611pt.
+ [9]
+<img/wyniki_naive_bayes_1.png, id=186, 728.7225pt x 292.84406pt>
+File: img/wyniki_naive_bayes_1.png Graphic file (type png)
+<use img/wyniki_naive_bayes_1.png>
+Package pdftex.def Info: img/wyniki_naive_bayes_1.png  used on input line 366.
+(pdftex.def)             Requested size: 380.28806pt x 152.82047pt.
+<img/wyniki_naive_bayes_2.png, id=187, 724.95844pt x 292.09125pt>
+File: img/wyniki_naive_bayes_2.png Graphic file (type png)
+<use img/wyniki_naive_bayes_2.png>
+Package pdftex.def Info: img/wyniki_naive_bayes_2.png  used on input line 373.
+(pdftex.def)             Requested size: 380.28806pt x 153.22093pt.
+ [10 <./img/wyniki_naive_bayes_1.png> <./img/wyniki_naive_bayes_2.png>]
+File: img/main_menu.png Graphic file (type png)
+<use img/main_menu.png>
+Package pdftex.def Info: img/main_menu.png  used on input line 385.
+(pdftex.def)             Requested size: 475.35826pt x 187.99611pt.
+
+[11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25]
+[26] [27] [28] [29] [30] [31] [32] [33] [34] [35] (dokumentacja_SSI.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
 Package rerunfilecheck Info: File `dokumentacja_SSI.out' has not changed.
-(rerunfilecheck)             Checksum: 8707D1836D4D0D90B14116370F6BC8D2;2229.
+(rerunfilecheck)             Checksum: 2C76FF98BC7459DBA8BCF893BD44A022;2081.
  ) 
 Here is how much of TeX's memory you used:
- 14901 strings out of 474479
- 239027 string characters out of 5743120
- 2045542 words of memory out of 5000000
- 36916 multiletter control sequences out of 15000+600000
- 574268 words of font info for 71 fonts, out of 8000000 for 9000
+ 16456 strings out of 474479
+ 261900 string characters out of 5743120
+ 2270542 words of memory out of 5000000
+ 37349 multiletter control sequences out of 15000+600000
+ 573955 words of font info for 70 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,756b,1256s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,756b,2000s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ect
-t0800.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi
-600\ectt1000.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen
-/ec/dpi600\ecrm0600.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/j
-knappen/ec/dpi600\ecbx1000.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/l
-jfour/jknappen/ec/dpi600\ecti1200.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fon
-ts/pk/ljfour/jknappen/ec/dpi600\ecrm0800.pk> <C:\Users\lenovo\AppData\Local\MiK
-TeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk> <C:\Users\lenovo\AppData\Lo
-cal\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1200.pk> <C:\Users\lenovo\App
-Data\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\len
-ovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Us
-ers\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk>
- <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1
-728.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
-0\ecrm1440.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/e
-c/dpi600\ecrm1095.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jkn
-appen/ec/dpi600\ecrm2074.pk><C:/Users/lenovo/AppData/Local/Programs/MiKTeX/font
-s/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/lenovo/AppData/Local/Programs/M
-iKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/lenovo/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/lenovo/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/len
-ovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/
-Users/lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.
-pfb><C:/Users/lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/
-cm/cmsy10.pfb><C:/Users/lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public
-/amsfonts/cm/cmsy8.pfb>
-Output written on dokumentacja_SSI.pdf (10 pages, 301384 bytes).
+t1000.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi
+600\ecrm0600.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen
+/ec/dpi600\ecbx1000.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/j
+knappen/ec/dpi600\ecti1200.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/l
+jfour/jknappen/ec/dpi600\ecrm0800.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fon
+ts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk> <C:\Users\lenovo\AppData\Local\MiK
+TeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1200.pk> <C:\Users\lenovo\AppData\Lo
+cal\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\lenovo\App
+Data\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\len
+ovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Us
+ers\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk>
+ <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1
+440.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
+0\ecrm1095.pk> <C:\Users\lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/e
+c/dpi600\ecrm2074.pk><C:/Users/lenovo/AppData/Local/Programs/MiKTeX/fonts/type1
+/public/amsfonts/cm/cmex10.pfb><C:/Users/lenovo/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/lenovo/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/lenovo/AppData/Loca
+l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/lenovo/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/l
+enovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:
+/Users/lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy
+10.pfb><C:/Users/lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
+ts/cm/cmsy8.pfb>
+Output written on dokumentacja_SSI.pdf (35 pages, 568170 bytes).
 PDF statistics:
- 781 PDF objects out of 1000 (max. 8388607)
- 76 named destinations out of 1000 (max. 500000)
- 142 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2228 PDF objects out of 2487 (max. 8388607)
+ 1199 named destinations out of 1200 (max. 500000)
+ 144 words of extra memory for PDF output out of 10000 (max. 10000000)
 
