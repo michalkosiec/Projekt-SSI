@@ -353,7 +353,7 @@ Model osiągnął skuteczność 58\%.
 	
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=1.0\textwidth]{knn-matrix.jpg}
+		\includegraphics[width=1.0\textwidth]{img/knn-matrix.jpg}
 		\caption{Macierz pomyłek dla KNN.}
 		\label{fig:wyniki_knn}
 	\end{figure}
@@ -399,7 +399,7 @@ Model osiągnął skuteczność 54\%.
 
     	\begin{figure}[htbp]
     		\centering
-    		\includegraphics[width=0.8\textwidth]{drzewko-matrix.jpg}
+    		\includegraphics[width=0.8\textwidth]{img/drzewko-matrix.jpg}
     		\caption{Macierz pomyłek dla drzewa decyzyjnego.}
     		\label{fig:drzewko}
     	\end{figure}
@@ -413,11 +413,11 @@ Model osiągnął skuteczność 54\%.
     
     \bigskip
     
-    \textbf{Drzewo Decyzyjne} jako jedyny model potrafi natywnie obsłużyć cechy kategoryczne poprzez podział równościowy, bez konieczności kodowania numerycznego. Kryterium podziału oparte na indeksie Giniego pozwala na automatyczny dobór najistotniejszych cech na każdym poziomie drzewa. Ograniczeniem jest jednak konieczność losowego próbkowania zbioru treningowego do 5~000 przykładów, co powoduje utratę informacji. Drzewo buduje twarde granice decyzyjne, które słabo uogólniają się na dane z dużą liczbą unikalnych wartości kategorycznych (np.\ identyfikator regionu z setkami wartości).
+    \textbf{Naiwny Bayes} osiągnął najwyższą skuteczność dzięki trafnemu dopasowaniu rozkładów prawdopodobieństwa do charakteru każdej cechy. Kluczową decyzją projektową było potraktowanie cech pozornie ciągłych (rok, miesiąc, piętro, liczba pięter, liczba pokoi, region) jako kategorycznych z rozkładem Multinomial -- co odpowiada rzeczywistości, gdyż przyjmują one skończoną liczbę wartości. Jedynie powierzchnia i powierzchnia kuchni modelowane są rozkładem Gaussa po transformacji logarytmicznej. Współrzędne geograficzne dyskretyzowane są do siatki $11 \times 11$~km, co pozwala grupować przestrzennie bliskie ogłoszenia bez obliczania rzeczywistych odległości. Całość wspomagana jest wygładzaniem Laplace'a (eliminacja problemu zerowych prawdopodobieństw) oraz wygładzaniem wariancji globalnej dla cech ciągłych. Obliczenia prowadzone w przestrzeni logarytmicznej zapobiegają niedopełnieniu arytmetycznemu.
     
     \bigskip
     
-    \textbf{Naiwny Bayes} osiągnął najwyższą skuteczność dzięki trafnemu dopasowaniu rozkładów prawdopodobieństwa do charakteru każdej cechy. Kluczową decyzją projektową było potraktowanie cech pozornie ciągłych (rok, miesiąc, piętro, liczba pięter, liczba pokoi, region) jako kategorycznych z rozkładem Multinomial -- co odpowiada rzeczywistości, gdyż przyjmują one skończoną liczbę wartości. Jedynie powierzchnia i powierzchnia kuchni modelowane są rozkładem Gaussa po transformacji logarytmicznej. Współrzędne geograficzne dyskretyzowane są do siatki $11 \times 11$~km, co pozwala grupować przestrzennie bliskie ogłoszenia bez obliczania rzeczywistych odległości. Całość wspomagana jest wygładzaniem Laplace'a (eliminacja problemu zerowych prawdopodobieństw) oraz wygładzaniem wariancji globalnej dla cech ciągłych. Obliczenia prowadzone w przestrzeni logarytmicznej zapobiegają niedopełnieniu arytmetycznemu.
+    \textbf{Drzewo Decyzyjne} jako jedyny model potrafi natywnie obsłużyć cechy kategoryczne poprzez podział równościowy, bez konieczności kodowania numerycznego. Kryterium podziału oparte na indeksie Giniego pozwala na automatyczny dobór najistotniejszych cech na każdym poziomie drzewa. Ograniczeniem jest jednak konieczność losowego próbkowania zbioru treningowego do 5~000 przykładów, co powoduje utratę informacji. Drzewo buduje twarde granice decyzyjne, które słabo uogólniają się na dane z dużą liczbą unikalnych wartości kategorycznych (np.\ identyfikator regionu z setkami wartości).
 
 	\newpage
 	\subsection{Wnioski}
